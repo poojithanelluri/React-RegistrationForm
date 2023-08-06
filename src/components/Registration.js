@@ -1,33 +1,45 @@
 import React from 'react'
 import { useState } from 'react'
 export default function Registration() {
-  const [form,setForm] = useState({});
- const handleForm=(e)=>{
-    
-    setForm({
-      ...form,
-      [e.target.name] : e.target.value
-    })
-  }
-      
- const handleSubmit=async(e)=>{
-    e.preventDefault();
-   const response=await fetch('http://localhost:8000/demo',{
+  const [title,setTitle]=useState('')
+  const [id,setId]=useState('')
+  const [stream,setStream]=useState('')
+  const [experience,setExperience]=useState('')
+  const [dob,setDob]=useState('')
+  const [address,setAddress]=useState('')
+  const [error,setError]=useState('')
+  const handleSubmit=async(e)=>{
+    e.preventDefault()
+    const student={title,id,stream,experience,dob,address}
+    const response=await fetch('/api/students',{
       method:'POST',
-      body : JSON.stringify(form),
+      body:JSON.stringify(student),
       headers:{
         'Content-Type':'application/json'
       }
     })
-   const data=await response.json();
-    console.log(data); 
+    const json=await response.json()
+    if(!response.ok){
+      setError(json.error)
+    }
+    if(response.ok){
+      setError(null)
+      setTitle('')
+      setId('')
+      setStream('')
+      setExperience('')
+      setDob('')
+      setAddress('')
+      console.log('new student addded',json)
+    }
+
   }
   return (
     <div>
       <div className="auth-wrapper">
        <div className="auth-inner">
-       <form onSubmit={handleSubmit}>
-        <h3>Sign Up</h3>
+       <form className="create" onSubmit={handleSubmit}>
+        <h3>Student Form</h3>
 
         <div className="mb-3">
           <label>Full Name</label>
@@ -36,14 +48,16 @@ export default function Registration() {
             name="name"
             className="form-control"
             placeholder="Enter Full name"
-            onChange={handleForm}
+            onChange={(e)=>setTitle(e.target.value)}
+            value={title}
           />
         </div>
 
         <div className="mb-3">
           <label>ID</label>
           <input type="text" name="id" className="form-control" placeholder="Enter ID"
-           onChange={handleForm}
+            onChange={(e)=>setId(e.target.value)}
+            value={id}
           />
          
         </div>
@@ -55,7 +69,8 @@ export default function Registration() {
             name="stream"
             className="form-control"
             placeholder="Enter Stream"
-            onChange={handleForm}
+            onChange={(e)=>setStream(e.target.value)}
+            value={stream}
           />
         </div>
 
@@ -66,7 +81,8 @@ export default function Registration() {
             name="experience"
             className="form-control"
             placeholder="Enter Experience"
-            onChange={handleForm}
+            onChange={(e)=>setExperience(e.target.value)}
+            value={experience}
           />
         </div>
 
@@ -77,14 +93,16 @@ export default function Registration() {
             name="dob"
             className="form-control"
             placeholder="Enter Date Of Birth "
-            onChange={handleForm}
+            onChange={(e)=>setDob(e.target.value)}
+            value={dob}
           />
         </div>
 
         <div className="mb-3">
           <label>Address</label>
           <textarea name="address" id="address" cols="30" rows="5"  className="form-control"
-          onChange={handleForm}
+           onChange={(e)=>setAddress(e.target.value)}
+           value={address}
           ></textarea>
           
         </div>
@@ -106,6 +124,8 @@ export default function Registration() {
             Save
           </button>
         </div>
+        {error && <div className="error">{error}</div>}
+    
       </form>
 </div>
     </div>
